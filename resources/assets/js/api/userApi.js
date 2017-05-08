@@ -31,6 +31,36 @@ class userApi extends api {
     {
         return this.Host + 'users/get-address/' + id;
     }
+
+    static getUserLockOrUnlockAction(id, status)
+    {
+        return this.Host + 'users/lock/' + id + '/' + parseInt(status);
+    }
+
+    static getRolesWithPerm()
+    {
+        return this.Host + 'users/roles-with-permission';
+    }
+
+    static getAllPerm()
+    {
+        return this.Host + 'users/all-perms';
+    }
+
+    static getSyncPerms(id)
+    {
+        return this.Host + 'users/sync-perms/' + id;
+    }
+
+    static getCreateRole()
+    {
+        return this.Host + 'users/create-role';
+    }
+
+    static getDelivers()
+    {
+        return this.Host + 'users/delivers';
+    }
 }
 
 export default userApi;

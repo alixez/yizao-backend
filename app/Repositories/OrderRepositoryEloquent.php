@@ -10,6 +10,7 @@ namespace App\Repositories;
 
 
 use App\Models\Order;
+use App\Models\User;
 use Prettus\Repository\Eloquent\BaseRepository;
 
 class OrderRepositoryEloquent extends BaseRepository implements OrderRepository
@@ -34,8 +35,37 @@ class OrderRepositoryEloquent extends BaseRepository implements OrderRepository
         ]);
 
         return $this->with(['user', 'products'])
-            ->paginate($limit)
-        ;
+            ->paginate($limit);
     }
 
+    public function updateStatus($id, $status)
+    {
+        $allStatus = [
+            'STATUS_NOT_PAID',
+            'STATUS_PAID',
+            'STATUS_DELIVER',
+            'STATUS_DID_DELIVER',
+            'STATUS_TRADE_FINISH',
+        ];
+        $status = strtoupper($status);
+        if (!in_array($status, $allStatus)) {
+            throw new \Exception('不支持的状态');
+        }
+
+        return $this->update([
+            'order_status' => $status,
+        ], $id);
+    }
+
+    public function updateDeliver($id, $userID)
+    {
+//        $user = User::findOne(['id' => $userID]);
+//        if (!$user) {
+//            throw new \Exception('没有该用户');
+//        }
+
+        return $this->update([
+            'deliver' => $userID,
+        ], $id);
+    }
 }

@@ -39,4 +39,13 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
 
         return $user;
     }
+
+    public function lockOrUnlockUser($id, $locked = true)
+    {
+        $user = $this->update([
+            'locked' => $locked,
+        ], $id);
+
+        return $user;
+    }
 }

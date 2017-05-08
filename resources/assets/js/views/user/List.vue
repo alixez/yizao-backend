@@ -32,7 +32,7 @@
                                         size="mini"
                                         type="danger"
                                         icon="warning"
-                                        @click="handleBand(scope.$index, scope.row)">禁用
+                                        @click="handleBand(scope.$index, scope.row)">{{scope.row.locked ? '启用' : '禁用'}}
                                 </el-button>
 
                         </template>
@@ -87,7 +87,18 @@
             },
 
             handleBand(index, row) {
-
+                const locked = row.locked ? 0 : 1;
+                const uri = this.userApi.getUserLockOrUnlockAction(row.id, locked);
+                this.$http.get(uri)
+                    .then((resp) => {
+                        console.log(resp.data);
+                        if (resp.data.code === 0) {
+                            row.locked = locked;
+                            this.$notify.success(resp.data.message);
+                        } else {
+                            this.$notify.error(resp.data.message || '操作失败');
+                        }
+                    }).catch((err) => {});
             },
 
             handleDelete(index, row) {

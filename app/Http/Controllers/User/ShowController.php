@@ -33,6 +33,17 @@ class ShowController extends Controller
         return response()->json($list);
     }
 
+    public function getAllDeliver(Request $req)
+    {
+        $list = $this->repository->whereHas('roles', function($query) {
+            $query->where('name', 'deliver');
+        })->all();
+
+        return response()->json([
+            'delivers' => $list,
+        ]);
+    }
+
     public function getAll(Request $req)
     {
         $allUsers = $this->repository->all();

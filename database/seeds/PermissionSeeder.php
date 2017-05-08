@@ -22,12 +22,12 @@ class PermissionSeeder extends \Illuminate\Database\Seeder
                 'description' => '编辑商品',
             ],
             [
-                'name' => 'product.delete',
+                'name' => 'product.remove',
                 'display_name' => '删除商品',
                 'description' => '删除一个商品',
             ],
             [
-                'name' => 'product.show',
+                'name' => 'product.read',
                 'display_name' => '查看商品',
                 'description' => '查看商品信息',
             ]

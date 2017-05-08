@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\CreateAndUpdateUser;
 use App\Repositories\UserAddressRepository;
 use App\Repositories\UserRepository;
+use Illuminate\Http\Request;
 
 class UpdateController extends Controller
 {
@@ -49,6 +50,32 @@ class UpdateController extends Controller
         return response()->json([
             'msg' => '修改成功',
             'user' => $user,
+        ]);
+    }
+
+    /**
+     *
+     * @param Request $req
+     * @param integer $userID
+     * @param integer $locked
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function lockedUser(Request $req, $userID, $locked = 1)
+    {
+        $this->authorizeBetter('user.locked');
+        if (intval($userID) === 1) {
+            return response()->json([
+                'code' => -1,
+                'message' => 'root账户不能被禁用',
+            ]);
+        }
+        $locked = boolval($locked);
+        $user = $this->repository->lockOrUnlockUser($userID, $locked);
+
+        return response()->json([
+            'code' => 0,
+            'message' => $locked ? '账户已被禁用' : '账户已经启用',
+            'data' => $user,
         ]);
     }
 }

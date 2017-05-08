@@ -20,4 +20,14 @@ interface OrderRepository extends RepositoryInterface
      * @return mixed
      */
     public function getTableDataByStatus($status, $limit = 25);
+
+    /**
+     *
+     * @param $id
+     * @param $status
+     * @return mixed
+     */
+    public function updateStatus($id, $status);
+
+    public function updateDeliver($id, $userID);
 }

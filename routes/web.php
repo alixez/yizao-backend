@@ -50,8 +50,7 @@ Route::group(['prefix' => 'product', 'namespace' => 'Product'], function() {
             'level' => '\d+',
             'parent' => '\d+',
         ])
-        ->name('product.get_types_by_level_parent')
-    ;
+        ->name('product.get_types_by_level_parent');
 
     Route::get('/types/{id}', 'ProductTypeController@getById')
         ->where([
@@ -91,54 +90,76 @@ Route::group(['prefix' => 'product', 'namespace' => 'Product'], function() {
 
 });
 
+// Order routes
 Route::group(['prefix' => 'order', 'namespace' =>'Order'], function () {
+    Route::post('/change_status/order_{orderID}/{orderStatus}', 'UpdateController@setStatus')
+        ->where('orderID', '\d+')
+        ->where('orderStatus', 'STATUS_NOT_PAID|STATUS_PAID|STATUS_DELIVER|STATUS_DID_DELIVER|STATUS_TRADE_FINISH')
+        ->name('order.update_status');
+
     Route::post('/simple-create', 'CreateController@simpleCreate')
-        ->name('order.create')
-    ;
+        ->name('order.create');
 
     Route::get('/table-data/{status}', 'ShowController@showTableData')
         ->where('status', 'not_paid|paid|deliver|did_deliver|trade_finish')
-        ->name('order.tableData')
-    ;
+        ->name('order.tableData');
+
+    Route::post('/update_deliver/order_{orderID}/{userID}', 'UpdateController@setDeliver')
+        ->where('orderID', '\d+')
+        ->where('userID', '\d+')
+        ->name('order.update_deliver');
 });
 
 // User routes
 Route::group(['prefix' => 'users', 'namespace' => 'User'], function () {
+
+    Route::get('/delivers', 'ShowController@getAllDeliver')
+        ->name('users.getDelivers');
+
     Route::get('/list', 'ShowController@getList')
-        ->name('users.get_list')
-    ;
+        ->name('users.get_list');
 
     Route::post('/create', 'CreateController@simpleCreate')
-        ->name('users.create')
-    ;
+        ->name('users.create');
 
     Route::post('/update', 'UpdateController@simpleUpdate')
-        ->name('users.update')
-    ;
+        ->name('users.update');
 
     Route::get('/get-one/{id}', 'ShowController@getOne')
         ->where('id', '\d+')
-        ->name('user.getOne')
-    ;
+        ->name('user.getOne');
 
     Route::get('/get-roles', 'RoleController@showAll')
-        ->name('users.roles')
-    ;
+        ->name('users.roles');
 
     Route::post('/create-user-address/{userId}', 'CreateController@createAddress')
         ->where('userId', '\d+')
-        ->name('users.createAddress')
-    ;
+        ->name('users.createAddress');
 
     Route::get('/all', 'ShowController@getAll')
-        ->name('users.getAll')
-    ;
+        ->name('users.getAll');
 
     Route::get('/get-address/{id}', 'ShowController@getUserAddress')
         ->where('id', '\d+')
-        ->name('users.getAddress')
-    ;
+        ->name('users.getAddress');
 
+    Route::get('/lock/{userID}/{locked?}', 'UpdateController@lockedUser')
+        ->where('locked', '\d+')
+        ->where('userID', '\d+')
+        ->name('users.lock');
 
+    Route::get('/roles-with-permission', 'RoleController@getRolesWithPermission')
+        ->name('user.rolesWithPerm');
+
+    Route::get('/all-perms', 'PermissionController@getPerms')
+        ->name('user.allPerms');
+
+    Route::post('/sync-perms/{id}', 'RoleController@syncRolePerms')
+        ->where('id', '\d+')
+        ->name('user.syncPerms');
+
+    Route::post('/create-role', 'RoleController@createRole')
+        ->name('user.createRole');
 });
+
 

@@ -10,5 +10,10 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  */
 interface RoleRepository extends RepositoryInterface
 {
-    //
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public function getPermissionByRoleID($id);
 }

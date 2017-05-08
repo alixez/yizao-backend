@@ -17,7 +17,9 @@ class CreateOrderTable extends Migration
             $table->increments('order_id');
             $table->string('order_no');
             $table->integer('order_address')->default(0);
+
             $table->integer('user_id');
+            $table->integer('deliver')->nullable(); // 配送员
             $table->string('order_status'); // 未支付, 已付款, 配送中, 完成
             $table->string('shipping_person')->nullable();
             $table->string('shipping_address')->nullable();

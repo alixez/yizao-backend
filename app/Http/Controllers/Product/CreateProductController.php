@@ -19,11 +19,13 @@ class CreateProductController extends Controller
 
     public function __construct(ProductRepository $repository)
     {
+        //$this->authorizeBetter('product.create');
         $this->repository = $repository;
     }
 
     public function create(CreateProduct $req)
     {
+        $this->authorizeBetter('product.create');
         $data = $req->getBody();
 
         $product = $this->repository->create($data);

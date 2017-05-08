@@ -24,13 +24,64 @@ class RoleController extends Controller
 
     public function showAll(Request $req)
     {
-        $roles = $this->repository->all();
-        if ($req->user() && $req->user()->hasRole('root')) {
-            return response()->json([
-                'roles' => $roles
-            ]);
-        }
+        $this->authorizeBetter(['roles.show', 'user.update', 'access.manager']);
 
-        return response()->json([]);
+        $roles = $this->repository->all();
+        return response()->json([
+            'roles' => $roles
+        ]);
+    }
+
+    public function getRolesWithPermission()
+    {
+        $this->authorizeBetter(['access.manager']);
+
+        $roles = $this->repository
+            ->with(['perms'])
+            ->all();
+
+        return response()->json([
+            'roles' => $roles,
+        ]);
+    }
+
+    /**
+     * Sync the permission
+     * @param Request $req
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function syncRolePerms(Request $req, $id) {
+
+        $this->authorizeBetter(['access.update']);
+
+        $perms = $req->get('perms');
+
+        $roles = $this->repository->find($id);
+        $roles->perms()->sync($perms);
+
+        $resRoles = $roles->toArray();
+        $resRoles['perms'] = $roles->perms;
+
+        return response()->json([
+            'roles' => $resRoles
+        ]);
+    }
+
+    /**
+     * Create new role
+     * @param Request $req
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function createRole(Request $req) {
+        $this->authorizeBetter(['roles.create']);
+
+        $role = $req->only(['name', 'display_name']);
+
+        $createdRole = $this->repository->create($role);
+        $createdRole->perms = [];
+        return response()->json([
+            'role' => $createdRole,
+        ]);
     }
 }

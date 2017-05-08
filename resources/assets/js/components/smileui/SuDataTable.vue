@@ -34,7 +34,7 @@
                                 :label="column.label">
                             <template scope="scope">
                                 <el-tag v-if="column.isAmount">￥{{ scope.row[prop] / 100 }}</el-tag>
-                                <span v-else>{{ scope.row[prop] }}</span>
+                                <span v-else>{{ getRowLabel(scope.row, prop) }}</span>
                             </template>
                         </el-table-column>
                     </template>
@@ -145,6 +145,20 @@
                 this.getTableData();
             },
 
+            getRowLabel(row, prop) {
+                const props = prop.split('.');
+                let result = '';
+                for (let i = 0; i < props.length; i ++) {
+                    let item = props[i];
+                    if (result !== '') {
+                        result = result[item];
+                    } else {
+                        result = row[item];
+                    }
+                }
+                return result;
+            },
+
             getTableData() {
 
                 let conf = {
@@ -163,11 +177,16 @@
                         this.pagination.perPage = parseInt(resp.data.per_page);
                         this.pagination.total = parseInt(resp.data.total);
                     })
+                    .catch((err) => {})
                 ;
             },
 
             removeRow(index) {
                 this.tableData.splice(index, 1);
+            },
+
+            updateRow(index, row) {
+                this.tableData[index] = row;
             },
 
             handleAdd() {

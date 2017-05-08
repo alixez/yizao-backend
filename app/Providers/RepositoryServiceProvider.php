@@ -13,6 +13,8 @@ use App\Repositories\OrderProductRepository;
 use App\Repositories\OrderProductRepositoryEloquent;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderRepositoryEloquent;
+use App\Repositories\PermissionRepository;
+use App\Repositories\PermissionRepositoryEloquent;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductRepositoryEloquent;
 use App\Repositories\ProductTypeRepository;
@@ -48,6 +50,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ProductRepository::class, ProductRepositoryEloquent::class);
         $this->app->bind(UserRepository::class, UserRepositoryEloquent::class);
         $this->app->bind(RoleRepository::class, RoleRepositoryEloquent::class);
+        $this->app->bind(PermissionRepository::class, PermissionRepositoryEloquent::class);
         $this->app->bind(UserAddressRepository::class, UserAddressRepositoryEloquent::class);
         $this->app->bind(OrderRepository::class, OrderRepositoryEloquent::class);
         $this->app->bind(OrderProductRepository::class, OrderProductRepositoryEloquent::class);

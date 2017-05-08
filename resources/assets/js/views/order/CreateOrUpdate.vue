@@ -5,7 +5,6 @@
                 <article class="tile is-child box">
 
                     <el-tabs v-model="activeName" @tab-click="handleClick">
-
                         <el-tab-pane label="订单详情" name="baseInfo">
                             <div class="columns">
                                 <div class="column is-half is-offset-one-quarter">
@@ -23,13 +22,12 @@
                                                         :label="item.name"
                                                         :value="item.id">
                                                     <span style="float: left">{{ item.name }}</span>
-                                                    <span style="float: right; color: #8492a6; font-size: 13px">{{ item.email
-                                                        }}</span>
+                                                    <span style="float: right; color: #8492a6; font-size: 13px">{{ item.email}}</span>
                                                 </el-option>
                                             </el-select>
                                         </el-form-item>
 
-                                        <el-form-item label="配送地址"  prop="order_address">
+                                        <el-form-item label="配送地址" prop="order_address">
 
                                             <el-select v-model="orderData.order_address"
                                                        @change="selectShippingAddress"
@@ -82,13 +80,17 @@
                                         <div class="columns">
                                             <div class="column">
                                                 <el-card class="box-card">
-                                                    <div v-for="(product, index) in orderData.products" class="text item">
+                                                    <div v-for="(product, index) in orderData.products"
+                                                         class="text item">
                                                         <div class="level">
                                                             <div class="level-left">
                                                                 {{ product.prod_title }} {{ product.prod_count }}份
+
                                                             </div>
                                                             <div class="level-right">
-                                                                <el-button size="mini" @click="deleteProduct(index)" style="color: red" class="el-icon-delete"></el-button>
+                                                                <el-button size="mini" @click="deleteProduct(index)"
+                                                                           style="color: red"
+                                                                           class="el-icon-delete"></el-button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -109,7 +111,8 @@
                                                                             size="mini"
                                                                             type="primary"
                                                                             @click="handleSelect(scope.$index, scope.row)">选择
-                                                                </el-button>
+
+                                                                    </el-button>
                                                                 </el-button-group>
                                                             </template>
                                                         </el-table-column>
@@ -125,8 +128,6 @@
                             </div>
 
                         </el-tab-pane>
-
-
                     </el-tabs>
 
                     <div class="columns">
@@ -180,7 +181,7 @@
                 }
             },
 
-            'orderData.user_id': function(value, oldValue) {
+            'orderData.user_id': function (value, oldValue) {
                 if (value !== oldValue) {
                     this.orderData.order_address = null;
                     this.getUserAddress(value);
@@ -193,6 +194,7 @@
                 productApi: product,
                 userApi: userApi,
                 activeName: 'baseInfo',
+                user: '',
                 users: [],
                 userAddresses: [],
                 orderData: {
@@ -294,7 +296,7 @@
                     cancelButtonText: '取消',
                     inputPattern: /\d+/,
                     inputErrorMessage: '请输入正确的数量',
-                }).then(({ value }) => {
+                }).then(({value}) => {
 
                     data.prod_count = parseInt(value);
                     const hasCurrentRow = this.orderData.products.find(item => {
@@ -329,24 +331,10 @@
                     .then((resp) => {
                         if (resp.data.order) {
                             this.$notify.success(this.saveSuccessText);
-                            this.$router.push({name: 'list_user'});
+                            this.$router.push({name: 'list_order'});
                         }
                     })
-                    .catch((err) => {
-                        const resp = err.response;
-                        if (resp) {
-                            // todo 根据不同的状态进行反馈
-                            if (resp.status === 404) {
-                                this.$message.warning('没有找到您请求的资源');
-                            }
-                            if (resp.status === 403) {
-                                this.$message.warning('抱歉，没有此操作的权限');
-                            }
-                        } else {
-                            this.$message.error('对方不想理你，并向你抛了个异常');
-                        }
-                    })
-                ;
+                    .catch((err) => {});
             },
 
             addAddress() {

@@ -24,13 +24,16 @@ class RoleRepositoryEloquent extends BaseRepository implements RoleRepository
         return Role::class;
     }
 
-    
-
     /**
      * Boot up the repository, pushing criteria
      */
     public function boot()
     {
         $this->pushCriteria(app(RequestCriteria::class));
+    }
+
+    public function getPermissionByRoleID($id)
+    {
+        return $this->find($id)->perms->toArray();
     }
 }

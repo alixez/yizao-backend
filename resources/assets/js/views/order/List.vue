@@ -4,6 +4,22 @@
         <div class="tile is-parent">
             <div class="tile is-child box">
 
+                <el-dialog title="选择配送人"
+                           :modal="false"
+                           :visible.sync="dialogSelectDeliverVisible">
+                    <el-form :model="deliver">
+                        <el-form-item label="配送人" label-width="40">
+                            <el-select v-model="deliver.id" placeholder="请选择活动区域">
+                                <el-option v-for="item in delivers" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-form>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialogSelectDeliverVisible = false">取 消</el-button>
+                        <el-button type="primary" @click="updateDeliver">确 定</el-button>
+                    </div>
+                </el-dialog>
+
                 <su-data-table
                         ref="dataTable"
                         :action="orderApi.getTableDataAction(activeTab)"
@@ -26,24 +42,35 @@
                                         size="mini"
                                         :plain="true"
                                         type="primary"
-                                        @click="handleEdit(scope.$index, scope.row)">修改
+                                        @click="handleShow(scope.$index, scope.row)">查看
                                 </el-button>
-                                <el-button
-                                        size="mini"
-                                        type="danger"
-                                        @click="handleDelete(scope.$index, scope.row)">删除
-                                </el-button>
+                                <!--<el-button-->
+                                        <!--size="mini"-->
+                                        <!--type="danger"-->
+                                        <!--@click="handleDelete(scope.$index, scope.row)">删除-->
+                                <!--</el-button>-->
                             </el-button-group>
+                            <el-button
+                                size="mini"
+                                :plain="true"
+                                type="warning"
+                                v-if="scope.row.order_status !== 'STATUS_TRADE_FINISH'"
+                                @click="handleChangeStatus(scope.$index, scope.row)">
+                                {{getStatusText(scope.row)}}
+                            </el-button>
                         </template>
                     </el-table-column>
+
                 </su-data-table>
+
             </div>
         </div>
+
     </div>
 </template>
 
 <script>
-    import { orderApi } from '../../api';
+    import { orderApi, userApi } from '../../api';
     import SuDataTable from 'components/smileui/SuDataTable';
 
     export default {
@@ -58,6 +85,13 @@
         data() {
             return {
                 name: '订单列表',
+                orderStatus: [
+                    'STATUS_NOT_PAID',
+                    'STATUS_PAID',
+                    'STATUS_DELIVER',
+                    'STATUS_DID_DELIVER',
+                    'STATUS_TRADE_FINISH'
+                ],
                 orderApi: orderApi,
                 tableAttribute: {
                     'order_id': {
@@ -92,10 +126,31 @@
                     }
                 },
                 activeTab: 'not_paid',
+
+                delivers: [],
+
+                deliver: {
+                    id: null,
+                    orderID:null,
+                },
+                dialogSelectDeliverVisible: false,
             }
         },
 
+        mounted() {
+            this.getDelivers(userApi);
+        },
+
         methods: {
+
+            getDelivers(userApi) {
+                this.$http.get(userApi.getDelivers())
+                    .then(resp => {
+                        console.log(resp);
+                        this.delivers = resp.data.delivers;
+
+                    });
+            },
 
             handleSelect(val) {
                 this.activeTab = val;
@@ -106,8 +161,71 @@
                 this.$router.push({name: 'create_order'});
             },
 
-            handleEdit(index, row) {
-                this.$router.push({name: 'update_order', params: {id: row.prod_id}});
+            handleShow(index, row) {
+                this.$router.push({name: 'show_order', params: {id: row.prod_id}});
+            },
+
+            getStatusText(row) {
+                const orderStatus = row.order_status;
+                switch (orderStatus) {
+                    case 'STATUS_NOT_PAID':
+                        return '已付款';
+                    case 'STATUS_PAID':
+                        return '配送';
+                    case 'STATUS_DELIVER':
+                        return '完成配送';
+                    case 'STATUS_DID_DELIVER':
+                        return '完成交易';
+                }
+            },
+
+            handleChangeStatus(index, row) {
+                const status = row.order_status;
+                const statusIndex = this.orderStatus.indexOf(status);
+                if (statusIndex + 1 === this.orderStatus.length) {
+                    return null;
+                }
+
+                if (this.orderStatus[statusIndex + 1] === 'STATUS_DELIVER') {
+                    console.log(123);
+                    this.dialogSelectDeliverVisible = true;
+                    this.deliver.orderID = row.order_id;
+                    this.deliver.orderStatus = this.orderStatus[statusIndex + 1];
+                    this.deliver.index = index;
+                    //const changeDeliverUri = this.orderApi.getChangeDeliverAction(row.order_id, )
+                } else {
+                    const uri = this.orderApi.getChangeStatusAction(row.order_id, this.orderStatus[statusIndex + 1]);
+                    this.$http.post(uri)
+                        .then(resp => {
+                            if (resp.status === 200 && resp.data.code === 1) {
+                                this.$notify.success(resp.data.message);
+                                this.$refs.dataTable.removeRow(index);
+                            } else {
+                                this.$notify.error(resp.data.message);
+                            }
+                        }).catch(err => {});
+                }
+            },
+
+            updateDeliver() {
+                const changeDeliverUri = this.orderApi.getChangeDeliverAction(this.deliver.orderID, this.deliver.id);
+                const index = this.deliver.index;
+                this.$http.post(changeDeliverUri)
+                    .then(resp => {
+                        if (resp.data.code && resp.data.code === 1) {
+                            const uri = this.orderApi.getChangeStatusAction(this.deliver.orderID, this.deliver.orderStatus);
+                            this.$http.post(uri)
+                                .then(resp => {
+                                    if (resp.status === 200 && resp.data.code === 1) {
+                                        this.$notify.success(resp.data.message);
+                                        this.$refs.dataTable.removeRow(index);
+                                    } else {
+                                        this.$notify.error(resp.data.message);
+                                    }
+                                    this.dialogSelectDeliverVisible = false;
+                                }).catch(err => {});
+                        }
+                    });
             },
 
             handleDelete(index, row) {
@@ -126,7 +244,6 @@
 //                    })
 //                ;
             }
-
         }
     }
 </script>

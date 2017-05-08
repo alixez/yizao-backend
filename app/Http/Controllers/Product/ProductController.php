@@ -26,19 +26,21 @@ class ProductController extends Controller
 
     public function getList()
     {
+        $this->authorizeBetter('product.read');
         $this->repository->pushCriteria(WithCoverCriteria::class);
         $this->repository->pushCriteria(WithTypeCriteria::class);
         $list = $this->repository->paginate();
-
         return response()->json($list);
     }
 
     public function delete($id)
     {
+        $this->authorizeBetter('product.remove');
         if (!$id) return response()->json([
             'error' => 1000,
             'msg' => 'Error attribute',
         ]);
+
         $this->repository->delete($id);
 
         return response()->json([
@@ -47,6 +49,7 @@ class ProductController extends Controller
     }
 
     public function getOne($id) {
+        $this->authorizeBetter('product.read');
         $this->repository->pushCriteria(WithCoverCriteria::class);
         $this->repository->pushCriteria(WithTypeCriteria::class);
         $res = $this->repository->find($id);
@@ -59,6 +62,7 @@ class ProductController extends Controller
 
     public function update(CreateProduct $req, $id)
     {
+        $this->authorizeBetter('product.update');
         $data = $req->getBody();
         $res = null;
         try {

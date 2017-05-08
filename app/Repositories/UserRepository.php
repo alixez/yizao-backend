@@ -28,4 +28,13 @@ interface UserRepository extends RepositoryInterface
      * @return mixed
      */
     public function updateWithRolesSync($attributes = [], array $roles, $id);
+
+    /**
+     * Locked or unlocked the user
+     * @param $id
+     * @param bool $locked
+     * @return mixed
+     */
+    public function lockOrUnlockUser($id, $locked = true);
+
 }

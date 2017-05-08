@@ -33,27 +33,36 @@ export default [
                             link: 'order/Create.vue'
                         },
                         component: lazyLoading('order/Create'),
+                    },
+                    {
+                        name: 'show_order',
+                        path: 'show',
+                        meta: {
+                            label: '订单详情',
+                            link: 'order/Show.vue'
+                        },
+                        component: lazyLoading('order/Show'),
                     }
                 ]
             },
-            {
-                path: '/distribution',
-                meta: {
-                    label: '配送中心',
-                },
-                component: lazyLoading('distribution', true),
-                children: [
-                    {
-                        name: 'list_distribution',
-                        path: '',
-                        meta: {
-                            label: '早餐配送',
-                            link: 'distribution/List.vue',
-                        },
-                        component: lazyLoading('distribution/List')
-                    }
-                ]
-            }
+            // {
+            //     path: '/distribution',
+            //     meta: {
+            //         label: '配送中心',
+            //     },
+            //     component: lazyLoading('distribution', true),
+            //     children: [
+            //         {
+            //             name: 'list_distribution',
+            //             path: '',
+            //             meta: {
+            //                 label: '早餐配送',
+            //                 link: 'distribution/List.vue',
+            //             },
+            //             component: lazyLoading('distribution/List')
+            //         }
+            //     ]
+            // }
         ]
     }
 ]

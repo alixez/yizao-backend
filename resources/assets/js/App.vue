@@ -36,6 +36,28 @@
                 }
             };
 
+            // 添加请求回复拦截
+            this.$http.interceptors.response.use(function (response) {
+                  return response;
+              }, (error) => {
+                  if (error.response) {
+                      const resp = error.response;
+                      if (resp.status === 404) {
+                          this.$message.warning('没有找到您请求的资源');
+                      }
+                      if (resp.status === 403) {
+                          this.$notify.warning('您没有该操作的权限!');
+                      }
+                      if (resp.status === 401) {
+                          this.$notify.warning('会话已过期，请重新登录');
+                      }
+                  } else {
+                      this.$notify.error('对方不想理你，并向你抛了个异常');
+                  }
+
+                  return Promise.reject(error);
+              });
+
             // 判断窗口改变的事件监听
             document.addEventListener('visibilitychange', handler);
             window.addEventListener('DOMContentLoaded', handler);

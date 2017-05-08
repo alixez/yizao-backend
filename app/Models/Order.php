@@ -33,7 +33,8 @@ class Order extends Model
         'shipping_time',
         'shipping_money',
         'total_price',
-        'remark'
+        'remark',
+        'deliver'
     ];
 
     public function __construct(array $attributes = [])
